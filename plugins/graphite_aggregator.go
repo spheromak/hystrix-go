@@ -3,11 +3,11 @@
 package plugins
 
 import (
-	"net"
 	"strings"
 	"time"
 
-	"github.com/afex/hystrix-go/hystrix/metric_collector"
+	metricCollector "github.com/afex/hystrix-go/hystrix/metric_collector"
+	"github.com/pantheon-systems/go-metrics-graphite"
 	"github.com/rcrowley/go-metrics"
 )
 
@@ -34,20 +34,9 @@ type GraphiteCollector struct {
 	runDurationPrefix       string
 }
 
-// GraphiteCollectorConfig provides configuration that the graphite client will need.
-type GraphiteCollectorConfig struct {
-	// GraphiteAddr is the tcp address of the graphite server
-	GraphiteAddr *net.TCPAddr
-	// Prefix is the prefix that will be prepended to all metrics sent from this collector.
-	Prefix string
-	// TickInterval spcifies the period that this collector will send metrics to the server.
-	TickInterval time.Duration
-}
-
-// InitializeGraphiteCollector creates the connection to the graphite server
-// and should be called before any metrics are recorded.
-func InitializeGraphiteCollector(config *GraphiteCollectorConfig) {
-	go metrics.Graphite(metrics.DefaultRegistry, config.TickInterval, config.Prefix, config.GraphiteAddr)
+// InitializeGraphiteCollector starts the collector sending to the graphite server
+func InitializeGraphiteCollector(config graphite.GraphiteConfig) {
+	go graphite.GraphiteWithConfig(config)
 }
 
 // NewGraphiteCollector creates a collector for a specific circuit. The
